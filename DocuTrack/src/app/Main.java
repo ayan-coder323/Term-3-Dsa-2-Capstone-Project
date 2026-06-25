@@ -79,31 +79,60 @@ public class Main {
 
     public static void main(String[] args) {
 
+        Database.initializeTables();
+        ArrayList<Document> dbDocs = Database.getAllDocuments();
+        for (Document doc : dbDocs) {
+            documents.add(doc);
+        }
+        rebuildIndexes();
+        graph.resize(documents.size());
+        resizeRouteCosts(documents.size());
+
         while (true) {
-
             printHeader("DOCUTRACK LOGIN");
+            printMenuTop();
+            printMenuOption("  [1] Login (Existing User)");
+            printMenuOption("  [2] Register (New User)");
+            printMenuOption("  [3] Exit");
+            printMenuBottom();
 
-            System.out.print(optionColor + "Username: " + ANSI_RESET);
-            String username = sc.next();
+            System.out.print(optionColor + "Enter Choice: " + ANSI_RESET);
+            int choice = sc.nextInt();
 
-            System.out.print(optionColor + "Password: " + ANSI_RESET);
-            String password = sc.next();
+            if (choice == 1) {
+                System.out.print(optionColor + "Username: " + ANSI_RESET);
+                String username = sc.next();
+                System.out.print(optionColor + "Password: " + ANSI_RESET);
+                String password = sc.next();
 
-            if (username.equals("admin") &&
-                password.equals("admin123")) {
+                String role = Database.authenticateAndGetRole(username, password);
+                if (role != null) {
+                    if (role.equalsIgnoreCase("admin")) {
+                        System.out.println("\nWelcome Admin " + username);
+                        adminMenu();
+                    } else {
+                        System.out.println("\nWelcome User " + username);
+                        userMenu();
+                    }
+                } else {
+                    System.out.println("Invalid Credentials");
+                }
+            } else if (choice == 2) {
+                System.out.print(optionColor + "New Username: " + ANSI_RESET);
+                String username = sc.next();
+                System.out.print(optionColor + "New Password: " + ANSI_RESET);
+                String password = sc.next();
 
-                System.out.println("\nWelcome Admin");
-                adminMenu();
-
-            } else if (username.equals("user") &&
-                       password.equals("user123")) {
-
-                System.out.println("\nWelcome User");
-                userMenu();
-
+                if (Database.addUser(username, password, "user")) {
+                    System.out.println("Registration successful! You can now login.");
+                } else {
+                    System.out.println("Registration failed. Username might already exist.");
+                }
+            } else if (choice == 3) {
+                System.out.println("Goodbye!");
+                break;
             } else {
-
-                System.out.println("Invalid Credentials");
+                System.out.println("Invalid Choice");
             }
         }
     }
@@ -932,12 +961,16 @@ public class Main {
             return;
         }
 
-        documents.add(doc);
-        rebuildIndexes();
-        graph.resize(documents.size());
-        resizeRouteCosts(documents.size());
+        if (Database.insertDocument(doc)) {
+            documents.add(doc);
+            rebuildIndexes();
+            graph.resize(documents.size());
+            resizeRouteCosts(documents.size());
 
-        System.out.println("Inserted Successfully");
+            System.out.println("Inserted Successfully");
+        } else {
+            System.out.println("Failed to insert into database");
+        }
     }
 
     static void deleteSharedDocument(int id) {
@@ -951,15 +984,19 @@ public class Main {
             return;
         }
 
-        int removedIndex =
-                documents.indexOf(found);
+        if (Database.deleteDocument(id)) {
+            int removedIndex =
+                    documents.indexOf(found);
 
-        documents.remove(found);
-        rebuildIndexes();
-        graph.removeVertex(removedIndex);
-        removeRouteCost(removedIndex);
+            documents.remove(found);
+            rebuildIndexes();
+            graph.removeVertex(removedIndex);
+            removeRouteCost(removedIndex);
 
-        System.out.println("Document deleted successfully");
+            System.out.println("Document deleted successfully");
+        } else {
+            System.out.println("Failed to delete from database");
+        }
     }
 
     static Document findDocument(int id) {
