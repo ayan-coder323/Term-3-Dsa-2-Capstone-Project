@@ -1,9 +1,6 @@
 # 📄 DocuTrack — Document Tracking & Management System
 
 > A console-based Java application that demonstrates the practical application of **Data Structures & Algorithms (DSA)** to a real-world document management problem. Documents can be indexed, searched, networked, routed, sorted, and storage-optimised — all through a role-based, menu-driven CLI.
-
----
-
 ## 📑 Table of Contents
 
 1. [Project Overview](#project-overview)
