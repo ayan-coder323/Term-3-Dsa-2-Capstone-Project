@@ -1,0 +1,69 @@
+flowchart TD
+    %% Styling customized to match the project's soothing teal/navy/cream presentation theme
+    classDef login fill:#0F1B2D,stroke:#38B2AC,stroke-width:2px,color:#fff,rx:10,ry:10
+    classDef role fill:#1A365D,stroke:#EDD88B,stroke-width:2px,color:#fff,rx:5,ry:5
+    classDef menu fill:#162A45,stroke:#68D391,stroke-width:2px,color:#fff,rx:5,ry:5
+    classDef submenu fill:#1E3A5F,stroke:#A0AEC0,stroke-width:1px,color:#fff
+    classDef action fill:#2D3748,stroke:#CBD5E0,stroke-width:1px,color:#fff
+    classDef database fill:#162A45,stroke:#81E6D9,stroke-width:3px,color:#fff
+
+    Start([Start DocuTrack]) ::: login --> LoginScreen{Authentication<br/>Login Screen} ::: login
+    
+    LoginScreen -->|admin / admin123| AdminRole[Admin Role] ::: role
+    LoginScreen -->|user / user123| UserRole[User Role] ::: role
+    
+    AdminRole --> AdminMenu[[ADMIN DASHBOARD<br/>Full Access]] ::: menu
+    UserRole --> UserMenu[[USER DASHBOARD<br/>Read-Only]] ::: menu
+    
+    %% ---------------- USER MENU ----------------
+    subgraph UserFlow [User Actions]
+        UserMenu --> U1[1. Search Document] ::: action
+        UserMenu --> U2[2. View All Documents] ::: action
+        UserMenu --> U3[3. Logout] ::: action
+    end
+    U3 -.->|Return to| LoginScreen
+    
+    %% ---------------- ADMIN MENU ----------------
+    AdminMenu --> CO1[1. CO1 - Document Indexing] ::: submenu
+    AdminMenu --> CO2[2. CO2 - Analytics] ::: submenu
+    AdminMenu --> CO3[3. CO3 - Document Network] ::: submenu
+    AdminMenu --> CO4[4. CO4 - Path Optimization] ::: submenu
+    AdminMenu --> CO5[5. CO5 - Sorting & Ranking] ::: submenu
+    AdminMenu --> CO6[6. CO6 - Storage Optimization] ::: submenu
+    AdminMenu --> ALogout[7. Logout] ::: action
+    ALogout -.->|Return to| LoginScreen
+    
+    %% CO1 Details
+    CO1 --> CO1_BST[BST Operations] ::: submenu
+    CO1 --> CO1_AVL[AVL Operations] ::: submenu
+    CO1_BST --> BST_Ops(Insert, Search, Delete,<br/>Inorder, Min, Max) ::: action
+    CO1_AVL --> AVL_Ops(Insert, Search, Inorder) ::: action
+    
+    %% CO2 Details
+    CO2 --> CO2_Ops(Fenwick Tree<br/>Segment Tree<br/>B-Tree<br/>B+ Tree) ::: action
+    
+    %% CO3 Details
+    CO3 --> CO3_Ops(View Docs, Add Relationship,<br/>Display Graph, BFS, DFS, MST) ::: action
+    
+    %% CO4 Details
+    CO4 --> CO4_Ops(View Docs, Add Route Cost,<br/>Display Route Costs, Dijkstra,<br/>Bellman-Ford, Floyd-Warshall,<br/>Topological Sort) ::: action
+    
+    %% CO5 Details
+    CO5 --> CO5_Ops(Merge Sort by ID<br/>Quick Sort by Title<br/>Heap Sort by Author<br/>Radix Sort by ID) ::: action
+    
+    %% CO6 Details
+    CO6 --> CO6_Ops(Activity Selection<br/>Fractional Knapsack<br/>0/1 Knapsack<br/>LIS on Document IDs) ::: action
+    
+    %% ---------------- SHARED DATA POOL ----------------
+    SharedData[(Shared Document Pool<br/>BST, AVL, Graph, Cost Matrix)] ::: database
+    
+    %% Data Interactions
+    BST_Ops -.->|Updates & Syncs| SharedData
+    AVL_Ops -.->|Updates & Syncs| SharedData
+    CO2_Ops -.->|Reads| SharedData
+    CO3_Ops -.->|Reads / Edits Edges| SharedData
+    CO4_Ops -.->|Reads / Edits Costs| SharedData
+    CO5_Ops -.->|Reads| SharedData
+    CO6_Ops -.->|Reads| SharedData
+    U1 -.->|Reads| SharedData
+    U2 -.->|Reads| SharedData
