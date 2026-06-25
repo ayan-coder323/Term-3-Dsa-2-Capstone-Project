@@ -1,0 +1,15 @@
+# Compiled Java files
+*.class
+
+# Eclipse build output
+bin/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
